@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using Suplex.Security.AclModel;
-using Suplex.Security.Principal;
 
 using Synapse.Services.Enterprise.Api;
 
@@ -11,7 +7,7 @@ namespace Synapse.Services.Controller.Dal
 {
     public partial class EnterpriseMemoryDal
     {
-        PlanContainer GetPlanContainer(string planUniqueName)
+        PlanContainer GetPlanContainer(string planUniqueName, bool returnTail, out PlanItem planItem)
         {
             string[] paths = planUniqueName.Split( '\\' );
 
@@ -19,24 +15,24 @@ namespace Synapse.Services.Controller.Dal
 
             bool ok = true;
             PlanContainer root = null;
-            PlanContainer rtn = null;
+            PlanContainer tail = null;
             for( int i = 0; i < paths.Length - 1; i++ )
             {
                 PlanContainer curr = list.Find( x => x.Name.Equals( paths[i], StringComparison.OrdinalIgnoreCase ) );
                 if( curr != null )
                 {
-                    if( rtn == null )
+                    if( tail == null )
                     {
-                        rtn = curr.Clone( true );
-                        rtn.Security = curr.Security;
-                        root = rtn;
+                        tail = curr.Clone( true );
+                        tail.Security = curr.Security;
+                        root = tail;
                     }
                     else
                     {
                         PlanContainer child = curr.Clone( true );
                         child.Security = curr.Security;
-                        rtn.Children.Add( child );
-                        rtn = child;
+                        tail.Children.Add( child );
+                        tail = child;
                     }
 
                     list = curr.Children;
@@ -48,14 +44,15 @@ namespace Synapse.Services.Controller.Dal
                 }
             }
 
+            planItem = null;
             if( ok )
             {
-                PlanItem planItem = _store.PlanItems.Find( p =>
-                    p.UniqueName.Equals( paths[paths.Length - 1], StringComparison.OrdinalIgnoreCase ) && p.PlanContainerUId == rtn.UId );
+                planItem = _store.PlanItems.Find( p =>
+                    p.UniqueName.Equals( paths[paths.Length - 1], StringComparison.OrdinalIgnoreCase ) && p.PlanContainerUId == tail.UId );
                 ok = planItem != null;
             }
 
-            return ok ? root : null;
+            return ok ? returnTail ? tail : root : null;
         }
     }
 }

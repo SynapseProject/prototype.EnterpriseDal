@@ -1,8 +1,6 @@
 ﻿namespace Synapse.Services.Controller.Dal
 {
-    public class PlanHistoryWriterItem
+    public class PlanHistoryWriterItem : ControllerDalExtensionBase
     {
-        public string Type { get; set; }
-        public object Config { get; set; }
     }
 }

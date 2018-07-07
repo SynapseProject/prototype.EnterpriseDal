@@ -1,12 +1,16 @@
 ﻿using System;
+
 using Suplex.Security.AclModel.DataAccess.Utilities;
 using Suplex.Utilities.Serialization;
+
+using YamlDotNet.Serialization;
+
 
 namespace Synapse.Services.Controller.Dal
 {
     public class EnterpriseFileStore : EnterpriseStore
     {
-        //[YamlIgnore]
+        [YamlIgnore]
         public string CurrentPath { get; internal set; }
 
 
