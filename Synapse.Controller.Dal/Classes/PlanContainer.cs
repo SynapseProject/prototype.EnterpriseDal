@@ -13,6 +13,7 @@ namespace Synapse.Services.Enterprise.Api
     {
         public string Description { get; set; }
         public string NodeUrl { get; set; }
+        public string PlansUri { get; set; }
         public string PlanExecuteReaderKey { get; set; }
         public bool HasPlanExecuteReaderKey { get { return !string.IsNullOrWhiteSpace( PlanExecuteReaderKey ); } }
         public string PlanHistoryWriterKey { get; set; }

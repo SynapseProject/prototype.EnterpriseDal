@@ -12,8 +12,7 @@ namespace Synapse.Services.Controller.Dal
     {
         public bool HasAccess(string securityContext, string planUniqueName, FileSystemRight right = FileSystemRight.Execute)
         {
-            PlanItem planItem = new PlanItem();
-            PlanContainer root = GetPlanContainer( planUniqueName, false, out planItem );
+            PlanContainer root = GetPlanContainer( planUniqueName );
             if( root == null )
                 throw new Exception( "Plan path invalid or Plan not found." );
 

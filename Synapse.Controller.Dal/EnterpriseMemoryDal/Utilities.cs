@@ -7,6 +7,11 @@ namespace Synapse.Services.Controller.Dal
 {
     public partial class EnterpriseMemoryDal
     {
+        PlanContainer GetPlanContainer(string planUniqueName, bool returnTail = false)
+        {
+            return GetPlanContainer( planUniqueName, returnTail, out PlanItem pi );
+        }
+
         PlanContainer GetPlanContainer(string planUniqueName, bool returnTail, out PlanItem planItem)
         {
             string[] paths = planUniqueName.Split( '\\' );

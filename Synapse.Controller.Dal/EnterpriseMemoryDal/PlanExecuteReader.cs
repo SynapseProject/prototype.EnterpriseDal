@@ -13,23 +13,28 @@ namespace Synapse.Services.Controller.Dal
     {
         public Plan GetPlan(string planUniqueName)
         {
-            PlanItem planItem = new PlanItem();
-            PlanContainer planContainer = GetPlanContainer( planUniqueName, true, out planItem );
-
-            PlanExecuteReaderItem peri = _store.DefaultExecuteReader;
-            if( planContainer.HasPlanExecuteReaderKey )
-                peri = _store.ExecuteReaders.SingleOrDefault( r => r.Key.Equals( planContainer.PlanExecuteReaderKey, StringComparison.OrdinalIgnoreCase ) );
-
-            if( peri == null )
-                throw new Exception( $"Could not load PlanExecuteReader [{planContainer.PlanExecuteReaderKey}]." );
-
-            IPlanExecuteReader reader = AssemblyLoader.Load<IPlanExecuteReader>( peri.Type, string.Empty );
+            PlanContainer planContainer = GetPlanContainer( planUniqueName, returnTail: true, planItem: out PlanItem planItem );
+            IPlanExecuteReader reader = GetPlanExecuteReader( planContainer );
             return reader.GetPlan( planItem.PlanFile );
         }
 
         public IEnumerable<string> GetPlanList(string filter = null, bool isRegexFilter = true)
         {
-            throw new NotImplementedException();
+            PlanContainer planContainer = GetPlanContainer( filter, returnTail: true );
+            IPlanExecuteReader reader = GetPlanExecuteReader( planContainer );
+            return reader.GetPlanList( planContainer.PlansUri, isRegexFilter );
+        }
+
+        IPlanExecuteReader GetPlanExecuteReader(PlanContainer planContainer)
+        {
+            PlanExecuteReaderItem ri = _store.DefaultExecuteReader;
+            if( planContainer.HasPlanExecuteReaderKey )
+                ri = _store.ExecuteReaders.SingleOrDefault( r => r.Key.Equals( planContainer.PlanExecuteReaderKey, StringComparison.OrdinalIgnoreCase ) );
+
+            if( ri == null )
+                throw new Exception( $"Could not load PlanExecuteReader [{planContainer.PlanExecuteReaderKey}]." );
+
+            return AssemblyLoader.Load<IPlanExecuteReader>( ri.Type, string.Empty );
         }
     }
 }
